@@ -4,6 +4,8 @@
 
 # to build salus:
 # bazel build //:salus-all
+# to build the minimal Liberum Wasm demo:
+# bazel build //:liberum-all
 
 # before pull request
 # bazel build //:clippy-all
@@ -44,6 +46,16 @@ filegroup(
     srcs = [
         "salus",
         "//test-workloads:tellus_guestvm",
+    ],
+)
+
+filegroup(
+    name = "liberum-all",
+    srcs = [
+        "salus",
+        "//test-workloads:create_guest_image",
+        "//test-workloads:tellus_wasmrt_raw",
+        "//test-workloads:wasmrt_guest_raw",
     ],
 )
 
@@ -178,6 +190,7 @@ salus_deps = [
         "//device-tree",
         "//drivers",
         "//hyp-alloc",
+        "@liberum_parent//liberum-core",
         "//mtt",
         "//page-tracking",
         "//rice",
@@ -205,7 +218,7 @@ salus_deps = [
 
 rust_binary(
     name = "salus",
-    srcs = glob(["src/*.rs"]),
+    srcs = glob(["src/**/*.rs"]),
     compile_data = glob(["src/*.S"]) + [
         ":umode_to_object",
         ":l_rule",
@@ -239,7 +252,7 @@ rust_doc(
 
 rust_test(
     name = "salus-unit-tests",
-    srcs = glob(["src/*.rs"]),
+    srcs = glob(["src/**/*.rs"]),
     crate_root = "src/main.rs",
     data = glob(["src/*.S"]) + ["src/salus-test.lds"],
     rustc_flags = [

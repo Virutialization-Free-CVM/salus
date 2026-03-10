@@ -17,9 +17,19 @@ objcopy_to_bin(
     src = ":guestvm",
 )
 
-rust_binary(
+objcopy_to_bin(
+    name = "tellus_wasmrt_raw",
+    src = ":tellus_wasmrt",
+)
+
+objcopy_to_bin(
+    name = "wasmrt_guest_raw",
+    src = ":wasmrt_guest",
+)
+
+sh_binary(
     name = "create_guest_image",
-    srcs = glob(["create_guest_image/*.rs"]),
+    srcs = ["create_guest_image/create_guest_image.sh"],
 )
 
 # from salus/test-workloads/src/consts.rs
@@ -36,6 +46,17 @@ genrule(
         ":guestvm_raw",
     ],
     outs = ["tellus_guestvm"],
+    cmd = "$(location :create_guest_image) $(SRCS) $@ " + str(max_tellus_size),
+    tools = [":create_guest_image"],
+)
+
+genrule(
+    name = "tellus_wasmrt_rule",
+    srcs = [
+        ":tellus_wasmrt_raw",
+        ":wasmrt_guest_raw",
+    ],
+    outs = ["tellus_wasmrt_guest"],
     cmd = "$(location :create_guest_image) $(SRCS) $@ " + str(max_tellus_size),
     tools = [":create_guest_image"],
 )
@@ -72,6 +93,26 @@ rust_binary(
 )
 
 rust_binary(
+    name = "tellus_wasmrt",
+    srcs = [
+        "src/bin/tellus_wasmrt.rs",
+    ],
+    crate_root = "src/bin/tellus_wasmrt.rs",
+    data = glob([
+        "src/**/*.S",
+    ]),
+    linker_script = "tellus.lds",
+    rustc_flags = [
+        "--codegen=link-arg=-nostartfiles",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//s-mode-utils",
+        "@liberum_parent//liberum-tellus-wasmrt",
+    ],
+)
+
+rust_binary(
     name = "guestvm",
     srcs = [
         "src/bin/guestvm.rs",
@@ -102,6 +143,26 @@ rust_binary(
     ],
 )
 
+rust_binary(
+    name = "wasmrt_guest",
+    srcs = [
+        "src/bin/wasmrt_guest.rs",
+    ],
+    crate_root = "src/bin/wasmrt_guest.rs",
+    data = glob([
+        "src/**/*.S",
+    ]),
+    linker_script = "guest.lds",
+    rustc_flags = [
+        "--codegen=link-arg=-nostartfiles",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//s-mode-utils",
+        "@liberum_parent//liberum-wasmrt-guest",
+    ],
+)
+
 rust_library(
     name = "test-workloads",
     srcs = glob(["src/*.rs"]),
@@ -127,7 +188,9 @@ rust_clippy(
     deps = [
         "guestvm",
         "tellus",
+        "tellus_wasmrt",
         "test-workloads",
+        "wasmrt_guest",
     ],
 )
 
@@ -136,7 +199,9 @@ rustfmt_test(
     targets = [
         "test-workloads",
         "tellus",
+        "tellus_wasmrt",
         "guestvm",
+        "wasmrt_guest",
         "create_guest_image",
     ],
 )

@@ -4,6 +4,12 @@
 
 workspace(name = "salus")
 
+local_repository(
+    name = "liberum_parent",
+    path = "..",
+)
+
+
 #
 # Rivos rules, repositories, and toolchains
 #

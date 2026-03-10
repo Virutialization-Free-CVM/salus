@@ -66,6 +66,7 @@ use smp::PerCpu;
 use sync::Once;
 use umode::UmodeTask;
 
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     println!("panic : {:?}", info);
@@ -125,6 +126,7 @@ unsafe impl GlobalAlloc for GeneralGlobalAlloc {
 static GENERAL_ALLOCATOR: GeneralGlobalAlloc = GeneralGlobalAlloc;
 
 /// Aborts if the system hits an allocation error.
+#[cfg(not(test))]
 #[alloc_error_handler]
 pub fn alloc_error(_layout: Layout) -> ! {
     abort()
