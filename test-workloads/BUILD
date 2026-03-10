@@ -23,6 +23,11 @@ objcopy_to_bin(
 )
 
 objcopy_to_bin(
+    name = "tellus_wasmrt_reject_raw",
+    src = ":tellus_wasmrt_reject",
+)
+
+objcopy_to_bin(
     name = "wasmrt_guest_raw",
     src = ":wasmrt_guest",
 )
@@ -98,6 +103,26 @@ rust_binary(
         "src/bin/tellus_wasmrt.rs",
     ],
     crate_root = "src/bin/tellus_wasmrt.rs",
+    data = glob([
+        "src/**/*.S",
+    ]),
+    linker_script = "tellus.lds",
+    rustc_flags = [
+        "--codegen=link-arg=-nostartfiles",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//s-mode-utils",
+        "@liberum_parent//liberum-tellus-wasmrt",
+    ],
+)
+
+rust_binary(
+    name = "tellus_wasmrt_reject",
+    srcs = [
+        "src/bin/tellus_wasmrt_reject.rs",
+    ],
+    crate_root = "src/bin/tellus_wasmrt_reject.rs",
     data = glob([
         "src/**/*.S",
     ]),
@@ -191,6 +216,7 @@ rust_clippy(
         "guestvm",
         "tellus",
         "tellus_wasmrt",
+        "tellus_wasmrt_reject",
         "test-workloads",
         "wasmrt_guest",
     ],
@@ -202,6 +228,7 @@ rustfmt_test(
         "test-workloads",
         "tellus",
         "tellus_wasmrt",
+        "tellus_wasmrt_reject",
         "guestvm",
         "wasmrt_guest",
         "create_guest_image",

@@ -40,7 +40,7 @@ extern "C" fn kernel_init(_hart_id: u64, fdt_addr: u64) {
     unsafe {
         let console_mem =
             core::slice::from_raw_parts_mut(&raw mut CONSOLE_BUFFER as *mut u8, CONSOLE_BUFFER_SIZE);
-        run_tellus_wasmrt_host(console_mem, fdt_addr, 0);
+        run_tellus_wasmrt_host(console_mem, fdt_addr, 1);
     }
 }
 
