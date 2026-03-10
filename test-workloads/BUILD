@@ -147,6 +147,7 @@ rust_binary(
     name = "wasmrt_guest",
     srcs = [
         "src/bin/wasmrt_guest.rs",
+        "src/consts.rs",
     ],
     crate_root = "src/bin/wasmrt_guest.rs",
     data = glob([
@@ -158,6 +159,7 @@ rust_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//test-workloads",
         "//s-mode-utils",
         "@liberum_parent//liberum-wasmrt-guest",
     ],

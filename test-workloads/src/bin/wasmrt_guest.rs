@@ -9,6 +9,8 @@
 
 use core::alloc::{GlobalAlloc, Layout};
 
+extern crate test_workloads;
+
 use liberum_wasmrt_guest::{run_wasmrt_guest, secondary_guest_init};
 use s_mode_utils::abort::abort;
 
@@ -29,11 +31,6 @@ static GENERAL_ALLOCATOR: GeneralGlobalAlloc = GeneralGlobalAlloc;
 
 #[alloc_error_handler]
 pub fn alloc_error(_layout: Layout) -> ! {
-    abort()
-}
-
-#[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
     abort()
 }
 
