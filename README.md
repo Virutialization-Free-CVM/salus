@@ -17,6 +17,16 @@ git submodule update --init
 bazel build //:salus-all
 ```
 
+When using the known-working `qemu` v10.0.0 setup below, build Salus with
+hardware A/D updates disabled:
+
+```bash
+bazel build //:salus-all --//:enable_hardware_ad_updates=false
+```
+
+Without this flag, Salus expects the RISC-V IOMMU `AMO_HWAD` capability and
+host boot may fail when probing the emulated IOMMU.
+
 ## Running
 
 ### Prerequisites
